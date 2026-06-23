@@ -4,7 +4,7 @@ export type PUStream = 'Science' | 'Commerce' | 'Arts' | 'General';
 
 export type MaterialCategory = 'Circular' | 'Notes' | 'Question Paper' | 'Syllabus & Blueprint';
 
-export type PUModule = 'Module 1' | 'Module 2' | 'Module 3' | 'Module 4' | 'Module 5' | 'Whole Syllabus';
+export type PUModule = string;
 
 export interface StudyMaterial {
   id: string;

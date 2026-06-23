@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   BookOpen, 
   FileText, 
@@ -149,6 +149,28 @@ export default function App() {
     return matchesSearch && matchesClass && matchesStream && matchesCategory && matchesSubject && matchesModule;
   });
 
+  // Dynamic list of chapters/modules partitions available based on current materials
+  const availablePartitions = useMemo(() => {
+    const partitions = new Set<string>();
+    materials.forEach(item => {
+      if (item.modulePartition && item.modulePartition.trim() !== '') {
+        partitions.add(item.modulePartition.trim());
+      }
+    });
+    // Natural alphanumeric sorting for chapters (e.g. "Chapter 1", "Chapter 2", "Chapter 10")
+    const sorted = Array.from(partitions).sort((a, b) => {
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+    });
+    
+    const list = ['All', 'Whole Syllabus'];
+    sorted.forEach(p => {
+      if (p !== 'Whole Syllabus' && !list.includes(p)) {
+        list.push(p);
+      }
+    });
+    return list;
+  }, [materials]);
+
   // Subjects corresponding to the active filter stream
   const availableSubjectsForFilter = PU_SUBJECTS.filter(sub => {
     if (filterStream === 'All') return true;
@@ -272,6 +294,7 @@ export default function App() {
         setUploadDescription('');
         setSelectedFile(null);
         setBase64Content('');
+        setUploadModule('Whole Syllabus');
       }, 1500);
 
     } catch (err) {
@@ -680,11 +703,11 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Modules partition */}
+                {/* Chapter/Part Partition */}
                 <div className="flex flex-wrap items-center gap-2" id="filter_row_module">
-                  <span className="text-xs font-semibold text-slate-400 w-16">Module:</span>
+                  <span className="text-xs font-semibold text-slate-400 w-16">Chapter/Part:</span>
                   <div className="flex flex-wrap gap-1.5 plan-selectors">
-                    {(['All', 'Module 1', 'Module 2', 'Module 3', 'Module 4', 'Module 5', 'Whole Syllabus'] as const).map(option => (
+                    {availablePartitions.map(option => (
                       <button 
                         key={option} 
                         type="button" 
@@ -1263,19 +1286,36 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Module Partition</label>
-                      <select 
+                      <label className="block text-slate-700 font-semibold mb-1">Chapter/Part Partition</label>
+                      <input 
+                        type="text"
+                        list="chapters-list"
                         value={uploadModule} 
-                        onChange={(e) => setUploadModule(e.target.value as any)}
-                        className="w-full bg-slate-50 border border-slate-200 outline-hidden focus:border-indigo-500 py-2.5 px-2.5 rounded-lg text-xs"
-                      >
-                        <option value="Whole Syllabus">Whole Syllabus</option>
-                        <option value="Module 1">Module 1</option>
-                        <option value="Module 2">Module 2</option>
-                        <option value="Module 3">Module 3</option>
-                        <option value="Module 4">Module 4</option>
-                        <option value="Module 5">Module 5</option>
-                      </select>
+                        onChange={(e) => setUploadModule(e.target.value)}
+                        placeholder="e.g. Chapter 1, Unit 2, Whole Syllabus"
+                        className="w-full bg-slate-50 border border-slate-200 outline-hidden focus:border-indigo-500 py-2.5 px-3 rounded-lg text-xs"
+                      />
+                      <datalist id="chapters-list">
+                        <option value="Whole Syllabus" />
+                        <option value="Chapter 1" />
+                        <option value="Chapter 2" />
+                        <option value="Chapter 3" />
+                        <option value="Chapter 4" />
+                        <option value="Chapter 5" />
+                        <option value="Chapter 6" />
+                        <option value="Chapter 7" />
+                        <option value="Chapter 8" />
+                        <option value="Chapter 9" />
+                        <option value="Chapter 10" />
+                        <option value="Chapter 11" />
+                        <option value="Chapter 12" />
+                        <option value="Chapter 13" />
+                        <option value="Chapter 14" />
+                        <option value="Chapter 15" />
+                        <option value="Unit 1" />
+                        <option value="Unit 2" />
+                        <option value="Unit 3" />
+                      </datalist>
                     </div>
 
                     <div>
